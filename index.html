@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Family Hub">
+<meta name="theme-color" content="#4e85a0" id="themeColorMeta">
+<title>Family Hub</title>
+<link rel="manifest" href="manifest.json">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════ VARIABLES ═══════════════════════════════ */
+:root {
+  /* Pastel card colours — full saturation pastels */
+  --cal-card:       #b8dff5;   /* sky blue */
+  --cal-card-dark:  #5a9dbf;
+  --cal-card-text:  #1a4a62;
+  --cal-chip:       #e8f6fd;
+
+  --notes-card:     #d4b8f5;   /* lavender */
+  --notes-card-dark:#8a5abf;
+  --notes-card-text:#3a1a62;
+  --notes-chip:     #f3ecfd;
+
+  --menu-card:      #b8f0c8;   /* mint green */
+  --menu-card-dark: #4a9e62;
+  --menu-card-text: #1a4a28;
+  --menu-chip:      #e8fbed;
+
+  --shop-card:      #ffd9b8;   /* peach */
+  --shop-card-dark: #c07840;
+  --shop-card-text: #5a2a08;
+  --shop-chip:      #fff3e8;
+
+  --timer-card:     #ffb8d4;   /* rose pink */
+  --timer-card-dark:#b84872;
+  --timer-card-text:#5a0a28;
+  --timer-chip:     #ffe8f2;
+
+  --bg:        #f4f1eb;
+  --surface:   #ffffff;
+  --surface2:  #f0ede6;
+  --text:      #2a2620;
+  --text2:     #706860;
+  --border:    #e2dbd0;
+  --shadow-sm: 0 3px 12px rgba(0,0,0,0.08);
+  --shadow-md: 0 8px 28px rgba(0,0,0,0.13);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.18);
+
+  --radius:    20px;
+  --radius-sm: 14px;
+  --radius-xs: 10px;
+
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+[data-theme="dark"] {
+  --cal-card:       #1e3d52;
+  --cal-card-dark:  #5a9dbf;
+  --cal-card-text:  #a8d8f0;
+  --cal-chip:       #152838;
+
+  --notes-card:     #2e1e48;
+  --notes-card-dark:#a870e0;
+  --notes-card-text:#cca8f0;
+  --notes-chip:     #1e1030;
+
+  --menu-card:      #1a3820;
+  --menu-card-dark: #60b878;
+  --menu-card-text: #a8e8b8;
+  --menu-chip:      #102818;
+
+  --shop-card:      #3a2010;
+  --shop-card-dark: #e09050;
+  --shop-card-text: #f0c898;
+  --shop-chip:      #281508;
+
+  --timer-card:     #381020;
+  --timer-card-dark:#e06090;
+  --timer-card-text:#f0a8c8;
+  --timer-chip:     #280810;
+
+  --bg:        #16141a;
+  --surface:   #221f2a;
+  --surface2:  #2a2736;
+  --text:      #e8e2d8;
+  --text2:     #908478;
+  --border:    #38334a;
+  --shadow-sm: 0 3px 12px rgba(0,0,0,0.3);
+  --shadow-md: 0 8px 28px rgba(0,0,0,0.4);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+/* ═══════════════════════════════ RESET ═══════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  transition: background 0.3s, color 0.3s;
+  overscroll-behavior: none;
+}
+
+/* ═══════════════════════════════ TOPBAR ═══════════════════════════════ */
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: calc(var(--safe-top) + 12px) 18px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  box-shadow: var(--shadow-sm);
+  z-index: 10;
+  gap: 10px;
+}
+
+.brand {
+  font-family: 'Lora', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+.brand em { font-style: italic; color: var(--cal-card-dark); }
+
+.topbar-mid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.clock-time {
+  font-family: 'Lora', serif;
+  font-size: 1.9rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: 0.03em;
+}
+.clock-date {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  margin-top: 1px;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.weather-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--cal-card);
+  border-radius: 50px;
+  padding: 6px 11px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--cal-card-text);
+  white-space: nowrap;
+}
+.weather-icon { font-size: 1rem; }
+
+.dark-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--text2);
+  transition: all 0.18s;
+  line-height: 1;
+}
+
+/* ═══════════════════════════════ SCROLL AREA ═══════════════════════════════ */
+.scroll-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding: 16px 14px calc(var(--safe-bottom) + 16px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ═══════════════════════════════ CARDS ═══════════════════════════════ */
+.card {
+  border-radius: var(--radius);
+  border: none;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  animation: cardIn 0.4s ease both;
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.card:active { transform: scale(0.975); box-shadow: var(--shadow-md); }
+
+.card-cal    { background: var(--cal-card); }
+.card-notes  { background: var(--notes-card); }
+.card-menu   { background: var(--menu-card); }
+.card-shop   { background: var(--shop-card); }
+.card-timer  { background: var(--timer-card); }
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.card:nth-child(1) { animation-delay: 0.04s; }
+.card:nth-child(2) { animation-delay: 0.09s; }
+.card:nth-child(3) { animation-delay: 0.14s; }
+.card:nth-child(4) { animation-delay: 0.19s; }
+.card:nth-child(5) { animation-delay: 0.24s; }
+
+.card-body { padding: 16px 18px 18px; }
+
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.card-ico {
+  width: 40px; height: 40px;
+  border-radius: 11px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.45);
+}
+.card-title {
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+.card-hint {
+  font-size: 0.72rem;
+  font-weight: 700;
+  opacity: 0.7;
+  margin-top: 1px;
+}
+.card-cal   .card-title, .card-cal   .card-hint { color: var(--cal-card-text); }
+.card-notes .card-title, .card-notes .card-hint { color: var(--notes-card-text); }
+.card-menu  .card-title, .card-menu  .card-hint { color: var(--menu-card-text); }
+.card-shop  .card-title, .card-shop  .card-hint { color: var(--shop-card-text); }
+.card-timer .card-title, .card-timer .card-hint { color: var(--timer-card-text); }
+
+/* Preview chips */
+.preview-chip {
+  display: block;
+  border-radius: var(--radius-xs);
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: rgba(255,255,255,0.5);
+}
+.card-cal   .preview-chip { color: var(--cal-card-text); }
+.card-notes .preview-chip { color: var(--notes-card-text); }
+.card-menu  .preview-chip { color: var(--menu-card-text); }
+.card-shop  .preview-chip { color: var(--shop-card-text); }
+.card-timer .preview-chip { color: var(--timer-card-text); }
+
+.card-empty {
+  font-size: 0.82rem;
+  font-style: italic;
+  opacity: 0.65;
+  padding: 2px 0;
+}
+.card-cal   .card-empty { color: var(--cal-card-text); }
+.card-notes .card-empty { color: var(--notes-card-text); }
+.card-menu  .card-empty { color: var(--menu-card-text); }
+.card-shop  .card-empty { color: var(--shop-card-text); }
+.card-timer .card-empty { color: var(--timer-card-text); }
+
+/* ── Calendar week strip on card ── */
+.cal-week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+.cal-strip-day {
+  background: rgba(255,255,255,0.4);
+  border-radius: 8px;
+  padding: 6px 3px;
+  text-align: center;
+  min-height: 52px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.cal-strip-day.today {
+  background: rgba(255,255,255,0.7);
+  box-shadow: 0 0 0 2px var(--cal-card-dark);
+}
+.cal-strip-label {
+  font-size: 0.58rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--cal-card-text);
+  opacity: 0.7;
+  margin-bottom: 2px;
+}
+.cal-strip-num {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--cal-card-text);
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.cal-strip-day.today .cal-strip-num { color: var(--cal-card-dark); }
+.cal-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--cal-card-dark);
+  margin: 1px 0;
+}
+
+/* ── Timer big display on card ── */
+.card-timer-display {
+  font-family: 'Lora', serif;
+  font-size: 2.6rem;
+  font-weight: 400;
+  color: var(--timer-card-text);
+  text-align: center;
+  padding: 4px 0 2px;
+  letter-spacing: 0.04em;
+}
+
+/* ═══════════════════════════════ OVERLAY / SHEET ═══════════════════════════════ */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.48);
+  z-index: 200;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.overlay.open { display: flex; }
+
+/* Bottom sheet style on mobile */
+.sheet {
+  background: var(--surface);
+  border-radius: 24px 24px 0 0;
+  width: 100%;
+  max-width: 600px;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  animation: sheetUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
+  overflow: hidden;
+  padding-bottom: var(--safe-bottom);
+}
+
+@keyframes sheetUp {
+  from { transform: translateY(100%); opacity: 0.5; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.sheet-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 50px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+.sheet-header {
+  padding: 14px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.sheet-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+.sheet-ico {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+}
+.sheet-cal   { --accent: var(--cal-card-dark);   }
+.sheet-notes { --accent: var(--notes-card-dark);  }
+.sheet-menu  { --accent: var(--menu-card-dark);   }
+.sheet-shop  { --accent: var(--shop-card-dark);   }
+.sheet-timer { --accent: var(--timer-card-dark);  }
+
+.sheet-cal   .sheet-ico { background: var(--cal-card); }
+.sheet-notes .sheet-ico { background: var(--notes-card); }
+.sheet-menu  .sheet-ico { background: var(--menu-card); }
+.sheet-shop  .sheet-ico { background: var(--shop-card); }
+.sheet-timer .sheet-ico { background: var(--timer-card); }
+
+.sheet-close {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 18px 20px;
+}
+
+.sheet-footer {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+/* ═══════════════════════════════ SECOND SHEET (forms) ═══════════════════════════════ */
+.overlay-form {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  z-index: 220;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  backdrop-filter: blur(3px);
+}
+.overlay-form.open { display: flex; }
+
+/* ═══════════════════════════════ FORMS ═══════════════════════════════ */
+.form-row { margin-bottom: 14px; }
+.form-label {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text2);
+  margin-bottom: 5px;
+}
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: var(--radius-xs);
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  outline: none;
+  transition: border-color 0.18s;
+  -webkit-appearance: none;
+}
+.form-input:focus, .form-textarea:focus { border-color: var(--accent, #4e85a0); }
+.form-textarea { resize: none; min-height: 90px; }
+
+/* ═══════════════════════════════ BUTTONS ═══════════════════════════════ */
+.btn {
+  padding: 11px 20px;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn:active { transform: scale(0.95); }
+.btn-accent {
+  background: var(--accent, #4e85a0);
+  color: white;
+}
+.btn-ghost {
+  background: var(--surface2);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+.btn-danger { background: #d04040; color: white; }
+
+/* ═══════════════════════════════ CALENDAR ═══════════════════════════════ */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 8px;
+}
+.cal-nav-title {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+  text-align: center;
+  flex: 1;
+}
+.cal-nav-btn {
+  background: var(--cal-card);
+  border: none;
+  border-radius: 50px;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.82rem;
+  color: var(--cal-card-text);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.cal-nav-today {
+  background: var(--cal-card-dark);
+  color: white;
+  font-size: 0.75rem;
+  padding: 7px 12px;
+}
+
+/* Vertical week layout for mobile */
+.cal-week-list { display: flex; flex-direction: column; gap: 8px; }
+.cal-day-row {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.cal-day-row.today {
+  background: var(--cal-card);
+  border-color: var(--cal-card-dark);
+}
+.cal-day-label-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.cal-day-row.today .cal-day-label-bar { border-color: rgba(255,255,255,0.3); }
+.cal-day-name-lbl {
+  font-weight: 900;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text2);
+}
+.cal-day-row.today .cal-day-name-lbl { color: var(--cal-card-text); }
+.cal-day-date-lbl {
+  font-family: 'Lora', serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.cal-day-row.today .cal-day-date-lbl { color: var(--cal-card-text); font-weight: 700; }
+.cal-day-events-area { padding: 6px 10px 8px; display: flex; flex-direction: column; gap: 4px; }
+.cal-ev-chip {
+  background: var(--cal-card-dark);
+  color: white;
+  border-radius: 7px;
+  padding: 5px 10px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+.cal-ev-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cal-ev-btns { display: flex; gap: 4px; flex-shrink: 0; }
+.cal-ev-btn {
+  background: rgba(255,255,255,0.25);
+  border: none;
+  border-radius: 5px;
+  width: 24px; height: 24px;
+  cursor: pointer;
+  font-size: 0.72rem;
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+}
+.cal-day-add-btn {
+  background: none;
+  border: 1px dashed var(--border);
+  border-radius: 7px;
+  padding: 5px 10px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--text2);
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+}
+.cal-day-row.today .cal-day-add-btn {
+  border-color: rgba(0,0,0,0.15);
+  color: var(--cal-card-text);
+  opacity: 0.8;
+}
+.cal-google-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: var(--cal-card);
+  border: none;
+  border-radius: var(--radius-xs);
+  font-family: 'Nunito', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--cal-card-text);
+  text-decoration: none;
+  margin-top: 18px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* ═══════════════════════════════ NOTES ═══════════════════════════════ */
+.note-item {
+  background: var(--notes-card);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.note-item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.note-item-title { font-weight: 800; font-size: 0.95rem; color: var(--notes-card-text); }
+.note-item-body { font-size: 0.84rem; color: var(--notes-card-text); opacity: 0.8; margin-top: 6px; line-height: 1.55; white-space: pre-wrap; }
+.note-item-date { font-size: 0.72rem; color: var(--notes-card-text); opacity: 0.6; font-weight: 700; margin-top: 8px; }
+
+/* ═══════════════════════════════ MENU ═══════════════════════════════ */
+.menu-day-row {
+  background: var(--menu-card);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.menu-day-row.today { box-shadow: 0 0 0 2.5px var(--menu-card-dark); }
+.menu-day-lbl { font-weight: 900; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--menu-card-text); width: 30px; flex-shrink: 0; }
+.menu-meal { flex: 1; font-size: 0.92rem; font-weight: 700; color: var(--menu-card-text); }
+.menu-meal.empty { opacity: 0.5; font-style: italic; font-weight: 600; }
+
+/* ═══════════════════════════════ SHOPPING ═══════════════════════════════ */
+.shop-progress {
+  background: var(--shop-card);
+  border-radius: 50px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--shop-card-text);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.shop-bar-wrap { width: 80px; height: 5px; background: rgba(0,0,0,0.12); border-radius: 50px; overflow: hidden; }
+.shop-bar { height: 100%; background: var(--shop-card-dark); border-radius: 50px; transition: width 0.3s; }
+.shop-item {
+  background: var(--shop-card);
+  border-radius: var(--radius-sm);
+  padding: 11px 14px;
+  margin-bottom: 7px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: opacity 0.2s;
+}
+.shop-item.done { opacity: 0.5; }
+.shop-checkbox {
+  width: 24px; height: 24px;
+  border-radius: 7px;
+  border: 2.5px solid var(--shop-card-dark);
+  flex-shrink: 0;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem;
+  color: white;
+  background: transparent;
+  transition: all 0.15s;
+}
+.shop-item.done .shop-checkbox { background: var(--shop-card-dark); border-color: var(--shop-card-dark); }
+.shop-item-name { flex: 1; font-size: 0.92rem; font-weight: 700; color: var(--shop-card-text); transition: all 0.2s; }
+.shop-item.done .shop-item-name { text-decoration: line-through; opacity: 0.7; }
+.shop-item-qty { font-size: 0.78rem; color: var(--shop-card-text); opacity: 0.7; font-weight: 700; white-space: nowrap; }
+.shop-section-head { font-size: 0.74rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: var(--shop-card-text); margin: 14px 0 7px; }
+
+/* ═══════════════════════════════ TIMER ═══════════════════════════════ */
+.timer-big {
+  font-family: 'Lora', serif;
+  font-size: 5rem;
+  font-weight: 400;
+  color: var(--timer-card-dark);
+  text-align: center;
+  padding: 16px 0;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  transition: color 0.3s;
+}
+.timer-big.paused { color: var(--text2); }
+.timer-big.done { color: #d04040; animation: flash 0.6s infinite; }
+@keyframes flash { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+.timer-msg { text-align: center; font-size: 0.88rem; font-weight: 700; color: var(--text2); min-height: 28px; padding-bottom: 4px; }
+
+.timer-presets { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 16px; }
+.timer-preset {
+  background: var(--timer-card);
+  border: none;
+  border-radius: 50px;
+  padding: 8px 16px;
+  font-family: 'Nunito', sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--timer-card-text);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.timer-preset.active, .timer-preset:active { background: var(--timer-card-dark); color: white; }
+
+.timer-custom { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; align-items: flex-end; }
+.timer-custom-group { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.timer-custom-input {
+  width: 62px;
+  text-align: center;
+  padding: 10px 6px;
+  border-radius: var(--radius-xs);
+  border: 1.5px solid var(--border);
+  background: var(--surface2);
+  color: var(--text);
+  font-family: 'Lora', serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  outline: none;
+  -webkit-appearance: none;
+}
+.timer-custom-sep { font-size: 1.4rem; font-weight: 900; color: var(--text2); padding-bottom: 14px; }
+.timer-custom-lbl { font-size: 0.68rem; font-weight: 800; text-transform: uppercase; color: var(--text2); letter-spacing: 0.05em; }
+.timer-controls { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+
+/* ═══════════════════════════════ ROW ACTIONS ═══════════════════════════════ */
+.row-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.row-btn {
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem;
+  background: rgba(255,255,255,0.45);
+  color: var(--text2);
+  transition: all 0.14s;
+}
+.row-btn.del { color: #c04040; }
+
+/* ═══════════════════════════════ CONFIRM ═══════════════════════════════ */
+.confirm-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55); z-index: 400;
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.confirm-overlay.open { display: flex; }
+.confirm-box {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 26px 24px;
+  max-width: 340px; width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  animation: sheetUp 0.22s ease;
+}
+.confirm-title { font-size: 1.05rem; font-weight: 900; margin-bottom: 8px; }
+.confirm-body  { font-size: 0.86rem; color: var(--text2); margin-bottom: 20px; line-height: 1.5; }
+.confirm-actions { display: flex; gap: 10px; justify-content: center; }
+
+/* ═══════════════════════════════ SECTION DIVIDER ═══════════════════════════════ */
+.section-div {
+  font-size: 0.72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--text2); margin: 16px 0 10px;
+  display: flex; align-items: center; gap: 8px;
+}
+.section-div::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ═══════════════════════════════ SCROLLBAR ═══════════════════════════════ */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 50px; }
+
+/* ═══════════════════════════════ INSTALL BANNER ═══════════════════════════════ */
+.install-banner {
+  display: none;
+  position: fixed;
+  bottom: calc(var(--safe-bottom) + 16px);
+  left: 50%; transform: translateX(-50%);
+  background: var(--cal-card-dark);
+  color: white;
+  border-radius: 50px;
+  padding: 12px 20px;
+  font-weight: 800;
+  font-size: 0.88rem;
+  cursor: pointer;
+  z-index: 50;
+  box-shadow: var(--shadow-md);
+  gap: 8px;
+  align-items: center;
+  white-space: nowrap;
+}
+.install-banner.visible { display: flex; }
+</style>
+</head>
+<body>
+
+<!-- ══════════ TOPBAR ══════════ -->
+<header class="topbar">
+  <div class="brand"><em>Family</em><br>Hub</div>
+  <div class="topbar-mid">
+    <div class="clock-time" id="clockTime">00:00</div>
+    <div class="clock-date" id="clockDate">Wed, 18 Feb</div>
+  </div>
+  <div class="topbar-right">
+    <div class="weather-pill">
+      <span class="weather-icon" id="weatherIcon">🌦️</span>
+      <span id="weatherTemp">—°C</span>
+    </div>
+    <button class="dark-btn" id="darkBtn" onclick="toggleDark()">🌙</button>
+  </div>
+</header>
+
+<!-- ══════════ CARDS ══════════ -->
+<div class="scroll-area">
+
+  <!-- CALENDAR -->
+  <div class="card card-cal" onclick="openSheet('cal')">
+    <div class="card-body">
+      <div class="card-head">
+        <div class="card-ico">📅</div>
+        <div>
+          <div class="card-title">Calendar</div>
+          <div class="card-hint" id="calCardWeekLabel">This week</div>
+        </div>
+      </div>
+      <div class="cal-week-strip" id="calWeekStrip"></div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="card card-notes" onclick="openSheet('notes')">
+    <div class="card-body">
+      <div class="card-head">
+        <div class="card-ico">📝</div>
+        <div>
+          <div class="card-title">Notes</div>
+          <div class="card-hint">Reminders &amp; ideas</div>
+        </div>
+      </div>
+      <div id="notesPreview"><span class="card-empty">No notes yet</span></div>
+    </div>
+  </div>
+
+  <!-- MENU -->
+  <div class="card card-menu" onclick="openSheet('menu')">
+    <div class="card-body">
+      <div class="card-head">
+        <div class="card-ico">🍽️</div>
+        <div>
+          <div class="card-title">Dinner Menu</div>
+          <div class="card-hint">This week's dinners</div>
+        </div>
+      </div>
+      <div id="menuPreview"><span class="card-empty">Plan your dinners</span></div>
+    </div>
+  </div>
+
+  <!-- SHOPPING -->
+  <div class="card card-shop" onclick="openSheet('shop')">
+    <div class="card-body">
+      <div class="card-head">
+        <div class="card-ico">🛒</div>
+        <div>
+          <div class="card-title">Shopping List</div>
+          <div class="card-hint" id="shopHint">Nothing needed</div>
+        </div>
+      </div>
+      <div id="shopPreview"><span class="card-empty">Add items to buy</span></div>
+    </div>
+  </div>
+
+  <!-- TIMER -->
+  <div class="card card-timer" onclick="openSheet('timer')">
+    <div class="card-body">
+      <div class="card-head">
+        <div class="card-ico">⏱️</div>
+        <div>
+          <div class="card-title">Timer</div>
+          <div class="card-hint" id="timerCardHint">Set a countdown</div>
+        </div>
+      </div>
+      <div class="card-timer-display" id="timerCardDisplay">0:00</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════
+     BOTTOM SHEETS
+══════════════════════════════ -->
+
+<!-- ── CALENDAR SHEET ── -->
+<div class="overlay" id="overlayCal">
+<div class="sheet sheet-cal">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title"><div class="sheet-ico">📅</div>Calendar</div>
+    <button class="sheet-close" onclick="closeSheet('cal')">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="cal-nav">
+      <button class="cal-nav-btn" onclick="calOffset(-1)">← Prev</button>
+      <div class="cal-nav-title" id="calSheetLabel">This week</div>
+      <button class="cal-nav-btn cal-nav-today" onclick="calToday()">Today</button>
+      <button class="cal-nav-btn" onclick="calOffset(1)">Next →</button>
+    </div>
+    <div class="cal-week-list" id="calWeekList"></div>
+    <a href="https://calendar.google.com/calendar/r?authuser=moloney.emc@gmail.com" target="_blank" class="cal-google-btn" onclick="event.stopPropagation()">
+      <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Open Google Calendar
+    </a>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn btn-ghost" onclick="closeSheet('cal')">Done</button>
+  </div>
+</div>
+</div>
+
+<!-- Add/Edit Event -->
+<div class="overlay-form" id="formEvent">
+<div class="sheet sheet-cal">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title"><div class="sheet-ico">📅</div><span id="eventFormTitle">Add Event</span></div>
+    <button class="sheet-close" onclick="closeForm('formEvent')">✕</button>
+  </div>
+  <div class="sheet-body">
+    <input type="hidden" id="eventEditId">
+    <div class="form-row"><label class="form-label">Title</label><input class="form-input" id="eventTitle" placeholder="e.g. School pickup"></div>
+    <div class="form-row"><label class="form-label">Date</label><input class="form-input" type="date" id="eventDate"></div>
+    <div class="form-row"><label class="form-label">Time (optional)</label><input class="form-input" type="time" id="eventTime"></div>
+    <div class="form-row"><label class="form-label">Notes (optional)</label><textarea class="form-textarea" id="eventDesc" placeholder="Any extra details..."></textarea></div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn btn-accent" onclick="saveEvent()">Save Event</button>
+    <button class="btn btn-ghost" onclick="closeForm('formEvent')">Cancel</button>
+  </div>
+</div>
+</div>
+
+<!-- ── NOTES SHEET ── -->
+<div class="overlay" id="overlayNotes">
+<div class="sheet sheet-notes">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title"><div class="sheet-ico">📝</div>Notes</div>
+    <button class="sheet-close" onclick="closeSheet('notes')">✕</button>
+  </div>
+  <div class="sheet-body"><div id="notesList"></div></div>
+  <div class="sheet-footer">
+    <button class="btn btn-accent" onclick="openAddNote()">＋ New Note</button>
+    <button class="btn btn-ghost" onclick="closeSheet('notes')">Done</button>
+  </div>
+</div>
+</div>
+
+<div class="overlay-form" id="formNote">
+<div class="sheet sheet-notes">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title"><div class="sheet-ico">📝</div><span id="noteFormTitle">New Note</span></div>
+    <button class="sheet-close" onclick="closeForm('formNote')">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="form-row"><label class="form-label">Title</label><input class="form-input" id="noteTitle" placeholder="Note title"></div>
+    <div class="form-row"><label class="form-label">Content</label><textarea class="form-textarea" id="noteContent" style="min-height:120px" placeholder="Write your note here..."></textarea></div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn btn-accent" onclick="saveNote()">Save Note</button>
+    <button class="btn btn-ghost" onclick="closeForm('formNote')">Cancel</button>
+  </div>
+</div>
+</div>
+
+<!-- ── MENU SHEET ── -->
+<div class="overlay" id="overlayMenu">
+<div class="sheet sheet-menu">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title"><div class="sheet-ico">🍽️</div>Dinner Menu</div>
+    <button class="sheet-close" onclick="closeSheet('menu')">✕</button>
+  </div>
+  <div class="sheet-body"><div id="menuList"></div></div>
+  <div class="sheet-footer">
+    <button class="btn btn-ghost" onclick="closeSheet('menu')">Done</button>
+  </div>
+</div>
+</div>
+
+<div class="overlay-form" id="formMeal">
+<div class="sheet sheet-menu">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title"><div class="sheet-ico">🍽️</div><span id="mealFormDay">Monday</span> Dinner</div>
+    <button class="sheet-close" onclick="closeForm('formMeal')">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="form-row"><label class="form-label">What's for dinner?</label><input class="form-input" id="mealInput" placeholder="e.g. Pasta bake"></div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn btn-accent" onclick="saveMeal()">Save</button>
+    <button class="btn btn-ghost" onclick="closeForm('formMeal')">Cancel</button>
+  </div>
+</div>
+</div>
+
+<!-- ── SHOPPING SHEET ── -->
+<div class="overlay" id="overlayShop">
+<div class="sheet sheet-shop">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title"><div class="sheet-ico">🛒</div>Shopping List</div>
+    <button class="sheet-close" onclick="closeSheet('shop')">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="shop-progress">
+      <span id="shopProgText">0 / 0</span>
+      <div class="shop-bar-wrap"><div class="shop-bar" id="shopBar" style="width:0%"></div></div>
+    </div>
+    <div id="shopListEl"></div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn btn-accent" onclick="openAddShop()">＋ Add Item</button>
+    <button class="btn btn-ghost" onclick="clearBought()">Clear Bought</button>
+    <button class="btn btn-ghost" onclick="closeSheet('shop')">Done</button>
+  </div>
+</div>
+</div>
+
+<div class="overlay-form" id="formShop">
+<div class="sheet sheet-shop">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title"><div class="sheet-ico">🛒</div><span id="shopFormTitle">Add Item</span></div>
+    <button class="sheet-close" onclick="closeForm('formShop')">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="form-row"><label class="form-label">Item Name</label><input class="form-input" id="shopName" placeholder="e.g. Milk"></div>
+    <div class="form-row"><label class="form-label">Quantity / Notes (optional)</label><input class="form-input" id="shopQty" placeholder="e.g. 2L, x3"></div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn btn-accent" onclick="saveShop()">Save</button>
+    <button class="btn btn-ghost" onclick="closeForm('formShop')">Cancel</button>
+  </div>
+</div>
+</div>
+
+<!-- ── TIMER SHEET ── -->
+<div class="overlay" id="overlayTimer">
+<div class="sheet sheet-timer">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header">
+    <div class="sheet-title"><div class="sheet-ico">⏱️</div>Timer</div>
+    <button class="sheet-close" onclick="closeSheet('timer')">✕</button>
+  </div>
+  <div class="sheet-body">
+    <div class="timer-big" id="timerBig">0:00</div>
+    <div class="timer-msg" id="timerMsg">Choose a preset or enter a custom time</div>
+    <div class="timer-presets">
+      <button class="timer-preset" onclick="setPreset(300)">5 min</button>
+      <button class="timer-preset" onclick="setPreset(600)">10 min</button>
+      <button class="timer-preset" onclick="setPreset(900)">15 min</button>
+      <button class="timer-preset" onclick="setPreset(1200)">20 min</button>
+      <button class="timer-preset" onclick="setPreset(1800)">30 min</button>
+      <button class="timer-preset" onclick="setPreset(3600)">1 hr</button>
+    </div>
+    <div class="timer-custom">
+      <div class="timer-custom-group">
+        <input class="timer-custom-input" type="number" id="tH" value="0" min="0" max="23">
+        <div class="timer-custom-lbl">hrs</div>
+      </div>
+      <div class="timer-custom-sep">:</div>
+      <div class="timer-custom-group">
+        <input class="timer-custom-input" type="number" id="tM" value="0" min="0" max="59">
+        <div class="timer-custom-lbl">min</div>
+      </div>
+      <div class="timer-custom-sep">:</div>
+      <div class="timer-custom-group">
+        <input class="timer-custom-input" type="number" id="tS" value="0" min="0" max="59">
+        <div class="timer-custom-lbl">sec</div>
+      </div>
+      <button class="btn btn-ghost" onclick="setCustom()" style="margin-left:6px;margin-bottom:2px;font-size:0.8rem;padding:10px 14px;">Set</button>
+    </div>
+    <div class="timer-controls">
+      <button class="btn btn-accent" id="timerStartBtn" onclick="timerStart()">▶ Start</button>
+      <button class="btn btn-ghost" id="timerPauseBtn" onclick="timerPause()" style="display:none">⏸ Pause</button>
+      <button class="btn btn-ghost" onclick="timerReset()">↺ Reset</button>
+    </div>
+  </div>
+  <div class="sheet-footer">
+    <button class="btn btn-ghost" onclick="closeSheet('timer')">Close</button>
+  </div>
+</div>
+</div>
+
+<!-- ── CONFIRM ── -->
+<div class="confirm-overlay" id="confirmOv">
+  <div class="confirm-box">
+    <div class="confirm-title">Delete this?</div>
+    <div class="confirm-body" id="confirmBody">This can't be undone.</div>
+    <div class="confirm-actions">
+      <button class="btn btn-danger" onclick="doDelete()">Yes, delete</button>
+      <button class="btn btn-ghost" onclick="cancelDelete()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── INSTALL BANNER ── -->
+<div class="install-banner" id="installBanner" onclick="installPWA()">
+  📲 Add to Home Screen
+</div>
+
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════ -->
+<script>
+/* ── SERVICE WORKER ── */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+/* ── STORAGE ── */
+const S = {
+  get(k,d){ try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch{return d;} },
+  set(k,v){ try{localStorage.setItem(k,JSON.stringify(v));}catch{} }
+};
+
+/* ── STATE ── */
+let events   = S.get('fha_events', []);
+let notes    = S.get('fha_notes',  []);
+let menu     = S.get('fha_menu',   {Mon:'',Tue:'',Wed:'',Thu:'',Fri:'',Sat:'',Sun:''});
+let shopList = S.get('fha_shop',   []);
+let dark     = S.get('fha_dark',   false);
+
+const DAYS      = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const DAYS_FULL = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+
+/* ── CLOCK ── */
+function tick(){
+  const n=new Date();
+  document.getElementById('clockTime').textContent =
+    String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('clockDate').textContent =
+    n.toLocaleDateString('en-NZ',{weekday:'short',day:'numeric',month:'short'});
+}
+tick(); setInterval(tick, 10000);
+
+/* ── WEATHER ── */
+async function fetchWeather(){
+  try{
+    const r=await fetch('https://api.open-meteo.com/v1/forecast?latitude=-40.914&longitude=174.9877&current=temperature_2m,weathercode&timezone=Pacific/Auckland');
+    const d=await r.json();
+    document.getElementById('weatherTemp').textContent=Math.round(d.current.temperature_2m)+'°C';
+    document.getElementById('weatherIcon').textContent=wmoIcon(d.current.weathercode);
+  }catch{}
+}
+function wmoIcon(c){
+  if(c===0)return'☀️';if(c<=2)return'⛅';if(c<=3)return'☁️';
+  if(c<=49)return'🌫️';if(c<=59)return'🌦️';if(c<=69)return'🌧️';
+  if(c<=79)return'❄️';if(c<=84)return'🌦️';return'⛈️';
+}
+fetchWeather(); setInterval(fetchWeather, 600000);
+
+/* ── DARK MODE ── */
+function applyDark(){
+  document.documentElement.setAttribute('data-theme', dark?'dark':'light');
+  document.getElementById('darkBtn').textContent = dark?'☀️':'🌙';
+  document.getElementById('themeColorMeta').setAttribute('content', dark?'#221f2a':'#4e85a0');
+}
+applyDark();
+function toggleDark(){ dark=!dark; S.set('fha_dark',dark); applyDark(); }
+
+/* ── SHEET OPEN/CLOSE ── */
+function openSheet(id){
+  document.getElementById('overlay'+cap(id)).classList.add('open');
+  refreshSection(id);
+}
+function closeSheet(id){
+  document.getElementById('overlay'+cap(id)).classList.remove('open');
+  renderPreviews();
+}
+function openForm(id){ document.getElementById(id).classList.add('open'); }
+function closeForm(id){ document.getElementById(id).classList.remove('open'); }
+function cap(s){ return s[0].toUpperCase()+s.slice(1); }
+
+/* Close overlays on backdrop tap */
+[...document.querySelectorAll('.overlay,.overlay-form')].forEach(ov=>{
+  ov.addEventListener('click', e=>{ if(e.target===ov){ ov.classList.remove('open'); renderPreviews(); } });
+});
+
+/* ── CONFIRM DELETE ── */
+let _delFn=null;
+function askDelete(msg,fn){ document.getElementById('confirmBody').textContent=msg; _delFn=fn; document.getElementById('confirmOv').classList.add('open'); }
+function doDelete(){ if(_delFn)_delFn(); _delFn=null; document.getElementById('confirmOv').classList.remove('open'); }
+function cancelDelete(){ _delFn=null; document.getElementById('confirmOv').classList.remove('open'); }
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+/* ═════════════════════════════
+   CALENDAR
+═════════════════════════════ */
+let _calDelta = 0;
+function dateKey(d){ return d.toISOString().slice(0,10); }
+function getWeekDates(delta){
+  const now=new Date(), day=now.getDay(), diff=day===0?-6:1-day;
+  const mon=new Date(now); mon.setDate(now.getDate()+diff+delta*7); mon.setHours(0,0,0,0);
+  return Array.from({length:7},(_,i)=>{ const d=new Date(mon); d.setDate(mon.getDate()+i); return d; });
+}
+function weekLabel(dates){
+  const a=dates[0],b=dates[6];
+  return a.toLocaleDateString('en-NZ',{day:'numeric',month:'short'})+' – '+b.toLocaleDateString('en-NZ',{day:'numeric',month:'short',year:'numeric'});
+}
+function todayKey(){ return dateKey(new Date()); }
+
+function calOffset(d){ _calDelta+=d; renderCalSheet(); }
+function calToday(){ _calDelta=0; renderCalSheet(); }
+
+function renderCalStrip(){
+  const dates=getWeekDates(0), tKey=todayKey();
+  const strip=document.getElementById('calWeekStrip');
+  const lbl=document.getElementById('calCardWeekLabel');
+  if(lbl) lbl.textContent=weekLabel(dates);
+  if(!strip) return;
+  strip.innerHTML='';
+  dates.forEach((d,i)=>{
+    const k=dateKey(d), isT=k===tKey;
+    const cnt=events.filter(e=>e.date===k).length;
+    const el=document.createElement('div');
+    el.className='cal-strip-day'+(isT?' today':'');
+    el.innerHTML=`<div class="cal-strip-label">${DAYS[i]}</div><div class="cal-strip-num">${d.getDate()}</div>${cnt?`<div class="cal-dot"></div>`:''}`;
+    strip.appendChild(el);
+  });
+}
+
+function renderCalSheet(){
+  const dates=getWeekDates(_calDelta), tKey=todayKey();
+  const lbl=document.getElementById('calSheetLabel');
+  if(lbl) lbl.textContent=weekLabel(dates);
+  const list=document.getElementById('calWeekList');
+  if(!list) return;
+  list.innerHTML='';
+  dates.forEach((d,i)=>{
+    const k=dateKey(d), isT=k===tKey;
+    const dayEvs=events.filter(e=>e.date===k).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+    const row=document.createElement('div');
+    row.className='cal-day-row'+(isT?' today':'');
+    const fullDate=d.toLocaleDateString('en-NZ',{day:'numeric',month:'short'});
+    row.innerHTML=`
+      <div class="cal-day-label-bar">
+        <span class="cal-day-name-lbl">${DAYS[i]}${isT?' ★':''}</span>
+        <span class="cal-day-date-lbl">${fullDate}</span>
+      </div>
+      <div class="cal-day-events-area" id="evArea_${k}"></div>`;
+    list.appendChild(row);
+
+    const area=document.getElementById('evArea_'+k);
+    dayEvs.forEach(ev=>{
+      const chip=document.createElement('div');
+      chip.className='cal-ev-chip';
+      chip.innerHTML=`
+        <span class="cal-ev-name">${ev.time?ev.time+' ':''}${esc(ev.title)}</span>
+        <div class="cal-ev-btns">
+          <button class="cal-ev-btn" onclick="event.stopPropagation();editEvent('${ev.id}')">✏️</button>
+          <button class="cal-ev-btn" onclick="event.stopPropagation();deleteEvent('${ev.id}')">✕</button>
+        </div>`;
+      area.appendChild(chip);
+    });
+    const addBtn=document.createElement('button');
+    addBtn.className='cal-day-add-btn';
+    addBtn.textContent='+ Add event';
+    addBtn.onclick=(e)=>{ e.stopPropagation(); openAddEventFor(k); };
+    area.appendChild(addBtn);
+  });
+}
+
+let _editEvId=null;
+function openAddEventFor(dateStr){
+  _editEvId=null;
+  document.getElementById('eventFormTitle').textContent='Add Event';
+  document.getElementById('eventTitle').value='';
+  document.getElementById('eventDate').value=dateStr;
+  document.getElementById('eventTime').value='';
+  document.getElementById('eventDesc').value='';
+  openForm('formEvent');
+}
+function editEvent(id){
+  const ev=events.find(e=>e.id===id); if(!ev) return;
+  _editEvId=id;
+  document.getElementById('eventFormTitle').textContent='Edit Event';
+  document.getElementById('eventTitle').value=ev.title;
+  document.getElementById('eventDate').value=ev.date;
+  document.getElementById('eventTime').value=ev.time||'';
+  document.getElementById('eventDesc').value=ev.desc||'';
+  openForm('formEvent');
+}
+function saveEvent(){
+  const title=document.getElementById('eventTitle').value.trim();
+  if(!title){ alert('Please enter a title.'); return; }
+  const ev={ id:_editEvId||Date.now().toString(), title, date:document.getElementById('eventDate').value, time:document.getElementById('eventTime').value, desc:document.getElementById('eventDesc').value.trim() };
+  if(_editEvId){ const i=events.findIndex(e=>e.id===_editEvId); if(i>-1)events[i]=ev; else events.push(ev); }
+  else events.push(ev);
+  S.set('fha_events',events); closeForm('formEvent'); renderCalSheet(); renderCalStrip();
+}
+function deleteEvent(id){
+  askDelete('Delete this event permanently?', ()=>{ events=events.filter(e=>e.id!==id); S.set('fha_events',events); renderCalSheet(); renderCalStrip(); });
+}
+
+/* ═════════════════════════════
+   NOTES
+═════════════════════════════ */
+let _editNoteId=null;
+function openAddNote(){
+  _editNoteId=null;
+  document.getElementById('noteFormTitle').textContent='New Note';
+  document.getElementById('noteTitle').value='';
+  document.getElementById('noteContent').value='';
+  openForm('formNote');
+}
+function editNote(id){
+  const n=notes.find(n=>n.id===id); if(!n) return;
+  _editNoteId=id;
+  document.getElementById('noteFormTitle').textContent='Edit Note';
+  document.getElementById('noteTitle').value=n.title;
+  document.getElementById('noteContent').value=n.content;
+  openForm('formNote');
+}
+function saveNote(){
+  const title=document.getElementById('noteTitle').value.trim();
+  if(!title){ alert('Please enter a title.'); return; }
+  const note={ id:_editNoteId||Date.now().toString(), title, content:document.getElementById('noteContent').value.trim(), date:new Date().toLocaleDateString('en-NZ',{day:'numeric',month:'short',year:'numeric'}) };
+  if(_editNoteId){ const i=notes.findIndex(n=>n.id===_editNoteId); if(i>-1)notes[i]=note; else notes.unshift(note); }
+  else notes.unshift(note);
+  S.set('fha_notes',notes); closeForm('formNote'); renderNotes();
+}
+function deleteNote(id){ askDelete('Delete this note?',()=>{ notes=notes.filter(n=>n.id!==id); S.set('fha_notes',notes); renderNotes(); }); }
+function renderNotes(){
+  const el=document.getElementById('notesList'); if(!el) return;
+  if(!notes.length){ el.innerHTML='<span class="card-empty" style="color:var(--notes-card-text)">No notes — add one!</span>'; return; }
+  el.innerHTML='';
+  notes.forEach(n=>{
+    const d=document.createElement('div'); d.className='note-item';
+    d.innerHTML=`<div class="note-item-head"><div class="note-item-title">${esc(n.title)}</div><div class="row-actions"><button class="row-btn" onclick="editNote('${n.id}')">✏️</button><button class="row-btn del" onclick="deleteNote('${n.id}')">🗑️</button></div></div>${n.content?`<div class="note-item-body">${esc(n.content)}</div>`:''}<div class="note-item-date">${n.date}</div>`;
+    el.appendChild(d);
+  });
+}
+
+/* ═════════════════════════════
+   MENU
+═════════════════════════════ */
+let _editMealDay=null;
+function openEditMeal(day){
+  _editMealDay=day;
+  document.getElementById('mealFormDay').textContent=DAYS_FULL[DAYS.indexOf(day)]||day;
+  document.getElementById('mealInput').value=menu[day]||'';
+  openForm('formMeal');
+}
+function saveMeal(){
+  menu[_editMealDay]=document.getElementById('mealInput').value.trim();
+  S.set('fha_menu',menu); closeForm('formMeal'); renderMenu();
+}
+function deleteMeal(day){ askDelete('Clear dinner for '+DAYS_FULL[DAYS.indexOf(day)]+'?',()=>{ menu[day]=''; S.set('fha_menu',menu); renderMenu(); }); }
+function todayShort(){ return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][new Date().getDay()]; }
+function renderMenu(){
+  const el=document.getElementById('menuList'); if(!el) return;
+  const today=todayShort(); el.innerHTML='';
+  DAYS.forEach((d,i)=>{
+    const meal=menu[d], isT=d===today;
+    const row=document.createElement('div'); row.className='menu-day-row'+(isT?' today':'');
+    row.innerHTML=`<div class="menu-day-lbl">${d}${isT?' ★':''}</div><div class="menu-meal${meal?'':' empty'}">${meal?esc(meal):'Not planned'}</div><div class="row-actions"><button class="row-btn" onclick="openEditMeal('${d}')">✏️</button>${meal?`<button class="row-btn del" onclick="deleteMeal('${d}')">🗑️</button>`:''}</div>`;
+    el.appendChild(row);
+  });
+}
+
+/* ═════════════════════════════
+   SHOPPING
+═════════════════════════════ */
+let _editShopId=null;
+function openAddShop(){
+  _editShopId=null;
+  document.getElementById('shopFormTitle').textContent='Add Item';
+  document.getElementById('shopName').value='';
+  document.getElementById('shopQty').value='';
+  openForm('formShop');
+}
+function editShop(id){
+  const it=shopList.find(x=>x.id===id); if(!it) return;
+  _editShopId=id;
+  document.getElementById('shopFormTitle').textContent='Edit Item';
+  document.getElementById('shopName').value=it.name;
+  document.getElementById('shopQty').value=it.qty||'';
+  openForm('formShop');
+}
+function saveShop(){
+  const name=document.getElementById('shopName').value.trim();
+  if(!name){ alert('Please enter an item name.'); return; }
+  const item={ id:_editShopId||Date.now().toString(), name, qty:document.getElementById('shopQty').value.trim(), done:_editShopId?(shopList.find(x=>x.id===_editShopId)||{}).done||false:false };
+  if(_editShopId){ const i=shopList.findIndex(x=>x.id===_editShopId); if(i>-1)shopList[i]=item; else shopList.push(item); }
+  else shopList.push(item);
+  S.set('fha_shop',shopList); closeForm('formShop'); renderShop();
+}
+function deleteShop(id){ askDelete('Remove this item?',()=>{ shopList=shopList.filter(x=>x.id!==id); S.set('fha_shop',shopList); renderShop(); }); }
+function toggleShop(id){ const it=shopList.find(x=>x.id===id); if(it){ it.done=!it.done; S.set('fha_shop',shopList); renderShop(); } }
+function clearBought(){
+  const n=shopList.filter(x=>x.done).length; if(!n) return;
+  askDelete(`Remove ${n} bought item${n>1?'s':''}?`,()=>{ shopList=shopList.filter(x=>!x.done); S.set('fha_shop',shopList); renderShop(); });
+}
+function renderShop(){
+  const el=document.getElementById('shopListEl');
+  const total=shopList.length, done=shopList.filter(x=>x.done).length, pct=total?Math.round(done/total*100):0;
+  const pt=document.getElementById('shopProgText'), pb=document.getElementById('shopBar');
+  if(pt) pt.textContent=done+' / '+total+' bought';
+  if(pb) pb.style.width=pct+'%';
+  if(!el) return;
+  if(!total){ el.innerHTML='<span style="font-size:0.84rem;color:var(--shop-card-text);opacity:0.6;font-style:italic">Your list is empty</span>'; return; }
+  el.innerHTML='';
+  const pending=shopList.filter(x=>!x.done), bought=shopList.filter(x=>x.done);
+  function rg(arr,head){
+    if(!arr.length) return;
+    if(head){ const h=document.createElement('div'); h.className='shop-section-head'; h.textContent=head; el.appendChild(h); }
+    arr.forEach(it=>{
+      const d=document.createElement('div'); d.className='shop-item'+(it.done?' done':'');
+      d.innerHTML=`<div class="shop-checkbox" onclick="toggleShop('${it.id}')">${it.done?'✓':''}</div><div class="shop-item-name">${esc(it.name)}</div>${it.qty?`<div class="shop-item-qty">${esc(it.qty)}</div>`:''}<div class="row-actions"><button class="row-btn" onclick="event.stopPropagation();editShop('${it.id}')">✏️</button><button class="row-btn del" onclick="event.stopPropagation();deleteShop('${it.id}')">🗑️</button></div>`;
+      el.appendChild(d);
+    });
+  }
+  rg(pending); if(bought.length) rg(bought,'✓ Bought');
+}
+
+/* ═════════════════════════════
+   TIMER
+═════════════════════════════ */
+let _tTotal=0,_tLeft=0,_tRunning=false,_tInt=null;
+function pad2(n){ return String(n).padStart(2,'0'); }
+function fmtT(s){ const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),ss=s%60; return h?`${h}:${pad2(m)}:${pad2(ss)}`:`${m}:${pad2(ss)}`; }
+function setPreset(s){ timerReset(true); _tTotal=_tLeft=s; updT(); document.querySelectorAll('.timer-preset').forEach(b=>b.classList.toggle('active',parseInt(b.getAttribute('onclick').match(/\d+/)[0])===s)); document.getElementById('timerMsg').textContent='Ready — press Start!'; }
+function setCustom(){ const h=parseInt(document.getElementById('tH').value)||0,m=parseInt(document.getElementById('tM').value)||0,s=parseInt(document.getElementById('tS').value)||0,tot=h*3600+m*60+s; if(!tot){ alert('Enter a time.'); return; } timerReset(true); _tTotal=_tLeft=tot; updT(); document.getElementById('timerMsg').textContent='Ready — press Start!'; }
+function timerStart(){ if(!_tLeft){ alert('Set a time first.'); return; } _tRunning=true; document.getElementById('timerStartBtn').style.display='none'; document.getElementById('timerPauseBtn').style.display=''; document.getElementById('timerBig').className='timer-big'; _tInt=setInterval(()=>{ if(_tLeft<=0){ timerDone(); return; } _tLeft--; updT(); },1000); }
+function timerPause(){ _tRunning=false; clearInterval(_tInt); document.getElementById('timerStartBtn').style.display=''; document.getElementById('timerStartBtn').textContent='▶ Resume'; document.getElementById('timerPauseBtn').style.display='none'; document.getElementById('timerBig').className='timer-big paused'; document.getElementById('timerMsg').textContent='Paused'; }
+function timerReset(silent){ _tRunning=false; clearInterval(_tInt); _tTotal=_tLeft=0; const b=document.getElementById('timerBig'); if(b){b.className='timer-big';b.textContent='0:00';} const cd=document.getElementById('timerCardDisplay'); if(cd)cd.textContent='0:00'; const sb=document.getElementById('timerStartBtn'); if(sb){sb.style.display='';sb.textContent='▶ Start';} const pb=document.getElementById('timerPauseBtn'); if(pb)pb.style.display='none'; if(!silent){ const m=document.getElementById('timerMsg'); if(m)m.textContent='Choose a preset or enter a custom time'; document.getElementById('timerCardHint').textContent='Set a countdown'; } document.querySelectorAll('.timer-preset').forEach(b=>b.classList.remove('active')); }
+function timerDone(){ clearInterval(_tInt); _tRunning=false; const b=document.getElementById('timerBig'); if(b){b.className='timer-big done';b.textContent='0:00';} document.getElementById('timerMsg').textContent="🔔 Time's up!"; document.getElementById('timerStartBtn').style.display=''; document.getElementById('timerStartBtn').textContent='▶ Start'; document.getElementById('timerPauseBtn').style.display='none'; document.getElementById('timerCardHint').textContent="⏰ Time's up!"; try{ const ac=new(window.AudioContext||window.webkitAudioContext)(); for(let i=0;i<3;i++){const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=880;g.gain.setValueAtTime(0.35,ac.currentTime+i*0.4);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+i*0.4+0.35);o.start(ac.currentTime+i*0.4);o.stop(ac.currentTime+i*0.4+0.35);} }catch{} }
+function updT(){ const s=fmtT(_tLeft); const b=document.getElementById('timerBig'); if(b)b.textContent=s; const cd=document.getElementById('timerCardDisplay'); if(cd)cd.textContent=s; const pct=_tTotal?Math.round(_tLeft/_tTotal*100):0; document.getElementById('timerCardHint').textContent=_tRunning?pct+'% remaining':'Set a countdown'; }
+
+/* ═════════════════════════════
+   SECTION REFRESH
+═════════════════════════════ */
+function refreshSection(id){
+  if(id==='cal') renderCalSheet();
+  else if(id==='notes') renderNotes();
+  else if(id==='menu') renderMenu();
+  else if(id==='shop') renderShop();
+}
+
+/* ═════════════════════════════
+   CARD PREVIEWS
+═════════════════════════════ */
+function renderPreviews(){
+  renderCalStrip();
+  const ne=document.getElementById('notesPreview');
+  if(ne) ne.innerHTML=notes.length ? notes.slice(0,2).map(n=>`<span class="preview-chip">${esc(n.title)}</span>`).join('') : '<span class="card-empty">No notes yet</span>';
+  const me=document.getElementById('menuPreview');
+  const today=todayShort(), ti=DAYS.indexOf(today);
+  const shown=DAYS.slice(ti,ti+3).filter(d=>menu[d]);
+  if(me) me.innerHTML=shown.length ? shown.map(d=>`<span class="preview-chip">${d}: ${esc(menu[d])}</span>`).join('') : '<span class="card-empty">Plan your dinners</span>';
+  const se=document.getElementById('shopPreview');
+  const sh=document.getElementById('shopHint');
+  const pend=shopList.filter(x=>!x.done), tot=shopList.length, don=shopList.filter(x=>x.done).length;
+  if(sh) sh.textContent=tot?`${don}/${tot} bought`:'Nothing needed';
+  if(se) se.innerHTML=pend.length ? pend.slice(0,3).map(it=>`<span class="preview-chip">${esc(it.name)}${it.qty?' · '+esc(it.qty):''}</span>`).join('') : tot&&don===tot?'<span class="preview-chip">✓ All done!</span>':'<span class="card-empty">Add items to buy</span>';
+}
+
+/* ═════════════════════════════
+   PWA INSTALL
+═════════════════════════════ */
+let _deferredPrompt=null;
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault(); _deferredPrompt=e;
+  document.getElementById('installBanner').classList.add('visible');
+});
+function installPWA(){
+  if(!_deferredPrompt) return;
+  _deferredPrompt.prompt();
+  _deferredPrompt.userChoice.then(()=>{ _deferredPrompt=null; document.getElementById('installBanner').classList.remove('visible'); });
+}
+window.addEventListener('appinstalled', ()=>{ document.getElementById('installBanner').classList.remove('visible'); });
+
+/* ── INIT ── */
+renderPreviews();
+</script>
+</body>
+</html>
